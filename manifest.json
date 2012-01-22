@@ -1,0 +1,15 @@
+{
+  "name": "File Writer Sample",
+  "version": "1",
+  "background_page": "background.html",
+  "content_scripts": [
+  	{
+  		"matches": [
+  			"http://www.w3.org/"
+  		],
+  		"js": [
+  			"contentscript.js"
+  		]
+  	}
+  ]
+}

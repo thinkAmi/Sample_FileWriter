@@ -1,0 +1,68 @@
+<html xmlns="http://www.w3.org/1999/xhtml1">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+
+  <body>
+    <script>
+      //  ダウンロード時の日本語文字化けを防ぐため、headタグにて文字コードを「utf-8」指定しておく
+
+      chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
+        var errorCallback = function(e){};
+
+        /*
+          現状では、[000000]ファイルが存在していないと、エラーとなってしまう
+          0バイトでもよいので、所定の位置にファイルを保管しておくこと
+        */
+        
+        webkitRequestFileSystem(TEMPORARY, 1024*1024, function(fileSystem){
+          fileSystem.root.getFile("testfile.txt", {'create':true}, function(fileEntry){
+            fileEntry.createWriter(function(fileWriter){
+            
+              alert(request.siteTitle);
+            
+              //  ファイルの書き込み位置は、一番最後とする
+              fileWriter.seek(fileWriter.length);
+
+              var blobBuilder = new WebKitBlobBuilder();
+
+              //  0バイトファイルの場合、ヘッダ行を作成する
+              if (fileWriter.length == 0)
+              {
+                var headers = new Array(addQuote("サイトタイトル"),
+                                        addQuote("URL"));
+                var header = headers.join(",");
+                blobBuilder.append(header);
+                
+                blobBuilder.append("\n");  //  ヘッダの終わりは改行
+              }
+
+              //  データ行の作成
+              var details = new Array(addQuote(request.siteTitle),
+                                      addQuote(request.siteUrl));
+
+              blobBuilder.append(details.join(','));
+              blobBuilder.append("\n");  //  データの終わりは改行
+
+              fileWriter.onerror = function(e){
+                alert("write failed : "+e);
+              };
+
+              fileWriter.write(blobBuilder.getBlob("text/plain"));
+            }, errorCallback);
+          }, errorCallback);
+        }, errorCallback);
+      });
+
+
+      /*
+        CSVファイル用に、項目をダブルクオートで囲む
+      */
+      function addQuote(field)
+      {
+        return  "\"" + field + "\"";
+      }
+
+    </script>
+  </body>
+</html>
