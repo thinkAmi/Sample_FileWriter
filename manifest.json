@@ -1,15 +1,23 @@
 {
   "name": "File Writer Sample",
-  "version": "1",
-  "background_page": "background.html",
+  "version": "2",
+  "manifest_version": 2,
+
+  "background": {
+    "persistent": true,
+    "scripts": [
+      "background.js"
+    ]
+  },
+
   "content_scripts": [
-  	{
-  		"matches": [
-  			"http://www.w3.org/"
-  		],
-  		"js": [
-  			"contentscript.js"
-  		]
-  	}
+    {
+      "matches": [
+        "http://www.w3.org/"
+      ],
+      "js": [
+        "contentscript.js"
+      ]
+    }
   ]
 }
